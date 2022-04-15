@@ -43,27 +43,34 @@ CHIP ALU {
 
     PARTS:
 
+    //input x of the ALU
     Mux16(a=x, b=false, sel=zx, out=outputx1);
     Not16(in=outputx1, out=negoutputx1);
     Mux16(a=outputx1, b=negoutputx1, sel=nx, out=outputx2);
 
+    //input y of the ALU
     Mux16(a=y, b=false, sel=zy, out=outputy1);
     Not16(in=outputy1, out=negoutputy1);
     Mux16(a=outputy1, b=negoutputy1, sel=ny, out=outputy2);
 
+    //ANDING and ADDING operation or function of ALU
     And16(a=outputx2, b=outputy2, out=andxy);
     Add16(a=outputx2, b=outputy2, out=addxy);
+
+    //selection of ANDING or ADDING operation of ALU
     Mux16(a=andxy, b=addxy, sel=f, out=funcxy);
 
+    //for negating operation after final result after ANDING or ADDING operaion
     Not16(in=funcxy, out=notfuncxy);
     Mux16(a=funcxy, b=notfuncxy, sel=no, out=out, out[15]=firstout, out[0..7]=finalleft, out[8..15]=finalright);
 
-
+    //for zero flag
     Or8Way(in=finalleft, out=zrl);
-    Or8Way(in=finalright, out=zrr);
+    Or8Way(in=finalright, out=zrr);    
     Or(a=zrl, b=zrr, out=nzr);
     Not(in=nzr, out=zr);
 
+    //for negative flag
     And(a=firstout, b=true, out=ng);
     
 
